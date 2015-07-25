@@ -46,16 +46,16 @@ if($e>0) {
   exit(1);
 }
 
-my $now = time();
-if($now > $latest) { $latest = $now; }
-my %sch; # maps timestamps to whether they are a scheduled pings
-my $i = prevping($earliest);
-$i = nextping($i);
-while($i <= $latest) {
-  $sch{$i} = 1;
-  $alltimes{$i} = 1;
-  $i = nextping($i);
-}
+#my $now = time();
+#if($now > $latest) { $latest = $now; }
+#my %sch; # maps timestamps to whether they are a scheduled pings
+#my $i = prevping($earliest);
+#$i = nextping($i);
+#while($i <= $latest) {
+  #$sch{$i} = 1;
+  #$alltimes{$i} = 1;
+  #$i = nextping($i);
+#}
 
 for my $t (sort(keys(%alltimes))) {
   my $missflag = 1;

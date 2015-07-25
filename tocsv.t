@@ -1,13 +1,13 @@
-use Test::Simple tests => 2;
+use Test::Simple tests => 4;
 use File::Temp qw/ tmpnam unlink0 /;
 
 sub test_tocsv {
-  local ($input, $expected_output) = @_;
+  local ($input, $expected_output, $args) = @_;
   local ($infile, $inpath) = tmpnam();
   print $infile $input;
   close($infile);
 
-  local $output = `./tocsv.pl $inpath` or die $!;
+  local $output = `./tocsv.pl $args $inpath` or die $!;
   
   ok($expected_output eq $output, <<HERE
 Expected: 
@@ -30,5 +30,10 @@ test_tocsv(
 );
 test_tocsv(
   "1434478731 Lila  [2015.06.16 14:18:51 Tue]\n1434478732  [2015.06.16 14:18:51 Tue]\n", 
-  "1434478731, Lila\n1434478732,"
+  "1434478731, Lila\n"
+);
+test_tocsv(
+  "1434478731 Lila  [2015.06.16 14:18:51 Tue]\n1434478732  [2015.06.16 14:18:51 Tue]\n", 
+  "1434478731, Lila\n1434478732,\n",
+  "--include-nonresponse"
 );

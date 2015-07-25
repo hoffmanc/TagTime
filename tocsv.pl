@@ -4,7 +4,7 @@
 BEGIN { require "$ENV{HOME}/.tagtimerc"; }
 require "util.pl";
 
-die "USAGE: $0 logfile\n" if @ARGV != 1;
+die "USAGE: $0 [--include-nonresponse] logfile\n" if @ARGV < 1;
 
 my $e = 0;         # number of lines with parse errors
 my $errstr = "";   # concatenation of bad lines from log files
@@ -12,6 +12,13 @@ my $earliest = -1; # earliest timestamp in all the log files
 my $latest = 0;    # latest timestamp in all the log files
 my %th;            # maps logfile+timestamp to tags for that log for that ping
 my %alltimes;      # maps all timestamps to 1
+
+my $include_nonresponse = 0;
+if($ARGV[0] eq "--include-nonresponse") {
+  shift @ARGV;
+  $include_nonresponse = 1;
+};
+
 for my $logfile (@ARGV) {
   open(LOG, $logfile) or die;
   $prevts = 0; # remember the previous timestamp
@@ -61,7 +68,7 @@ for my $t (sort(keys(%alltimes))) {
   my $missflag = 1;
   my @p = ();
   for my $l (@ARGV) {
-    if(defined($th{$l.$t})) { 
+    if(length(strip($th{$l.$t})) > 0) {
       $missflag = 0; 
       push(@p, $th{$l.$t});
       my @q = split(' ', strip($th{$l.$t}));
@@ -70,6 +77,7 @@ for my $t (sort(keys(%alltimes))) {
       }
     }
   }
+  print "$t,\n" if $include_nonresponse == 1 && $missflag == 1;
   #if($sch{$t} && $missflag) { print annotime('MISSING', $t, 33), "\n";; }
   #if(!$sch{$t})             { print "$t UNSCHED ", join(' ', @p), "\n"; }
   #print $t, " ", join(' + ', @p), "\n";
